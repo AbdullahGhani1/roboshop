@@ -19,3 +19,6 @@
         dest: /etc/nginx/default.d/roboshop.conf
 
     - name: Recursively remove directory
+      ansible.builtin.file:
+        path: /usr/share/nginx/html
+        state: absent
