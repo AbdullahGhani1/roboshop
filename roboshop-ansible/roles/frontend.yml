@@ -1,5 +1,21 @@
 - name: RoboShop Project - Frontend
   hosts: all
   become: true
-  roles:
-    - frontend
+  tasks:
+    - name: install Nginx
+      ansible.builtin.yum:
+        name: nginx
+        state: installed
+
+    - name: Start Nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted
+        enabled: yes
+
+    - name: Copy RoboShop Configuration
+      ansible.builtin.copy:
+        src: nginx-roboshop.conf
+        dest: /etc/nginx/default.d/roboshop.conf
+
+    - name: Recursively remove directory
