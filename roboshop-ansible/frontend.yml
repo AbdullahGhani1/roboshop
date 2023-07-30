@@ -12,7 +12,7 @@
         src: nginx-roboshop.conf
         dest: /etc/nginx/default.d/roboshop.conf
 
-    - name: Recursively remove directory
+    - name: Clean old Content
       ansible.builtin.file:
         path: /usr/share/nginx/html
         state: absent
@@ -22,13 +22,13 @@
         path: /usr/share/nginx/html
         state: directory
 
-    - name: Download Application Content
+    - name: Download and extract application Content
       ansible.builtin.unarchive:
         src: https://roboshop-artifacts.s3.amazonaws.com/frontend.zip
         dest: /usr/share/nginx/html
         remote_src: yes
 
-    - name: Start Nginx
+    - name: Restart Nginx
       ansible.builtin.systemd:
         name: nginx
         state: restarted
