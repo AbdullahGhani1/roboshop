@@ -1,0 +1,9 @@
+- name: Catalogue Setup
+  hosts: all
+  become: yes
+  vars:
+    component: catalogue
+  tasks:
+    - name: Include task list in play
+      ansible.builtin.import_tasks:
+        file: nodejs.yml
