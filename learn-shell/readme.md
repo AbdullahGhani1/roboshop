@@ -12,3 +12,11 @@ List of Topics:
 6. Loops
 7. Exit Status & Redirectors & Quotes
 8. SED Editor
+
+---
+
+# RoboShop Project
+
+### Frontend
+
+- Note: serveices install with sudo user - centos user not have access to install packages
