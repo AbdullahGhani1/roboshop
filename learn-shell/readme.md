@@ -905,3 +905,143 @@ systemctl daemon-reload
 systemctl enable shipping
 systemctl restart shipping
 ```
+
+### 09. RabbitMQ
+
+RabbitMQ is a messaging Queue which is used by some components of the applications.
+
+1. Configure YUM Repos from the script provided by vendor.
+
+```sh
+curl -s https://packagecloud.io/install/repositories/rabbitmq/erlang/script.rpm.sh | bash
+```
+
+2.Configure YUM Repos for RabbitMQ.
+
+```sh
+curl -s https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh | bash
+```
+
+3. Install RabbitMQ
+
+```sh
+yum install rabbitmq-server -y
+```
+
+4. Start RabbitMQ Service
+
+```sh
+systemctl enable rabbitmq-server
+systemctl start rabbitmq-server
+```
+
+5. RabbitMQ comes with a default username / password as `guest/guest`. But this user cannot be used to connect. Hence, we need to create one user for the application.
+
+```sh
+rabbitmqctl add_user roboshop roboshop123
+rabbitmqctl set_permissions -p / roboshop ".*" ".*" ".*"
+```
+
+### 10. Payment
+
+This service is responsible for payments in RoboShop e-commerce app. This service is written on `Python 3.6`, So need it to run this app.
+
+1. Install Python 3.6
+
+```sh
+yum install python36 gcc python3-devel -y
+```
+
+We need to setup a new service in systemd so systemctl can manage this service
+
+<div style="background-color: #eef9fd; padding: 10px; border-radius: 5px;border-left:4px solid #4cb3d4">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+ <svg  style="display:inline-block;height:1.6em;width:1.6em;" viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+INFO
+</span>
+<br>
+We already discussed in linux basics that advantages of systemctl managing services, Hence we are taking that approach. Which is also a standard way in the OS.
+
+RECAP You can create file by using <strong>vim /etc/systemd/system/payment.service
+</strong>
+
+</div>
+<br>
+
+2. Setup SystemD Payment Service
+
+```sh
+cp payment.service /etc/systemd/system/payment.service
+```
+
+Configure the application.
+
+<div style="background-color: #eef9fd; padding: 10px; border-radius: 5px;border-left:4px solid #4cb3d4">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+ <svg  style="display:inline-block;height:1.6em;width:1.6em;" viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+INFO
+</span>
+<br>
+Our application developed by the developer of our org and it is not having any RPM software just like other softwares. So we need to configure every step manually
+
+</div>
+<br>
+
+<div style="background-color: #fff8e6; padding: 10px; border-radius: 5px;border-left:4px solid #d99e00">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+<svg style="display:inline-block;height:1.6em;width:1.6em;" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg>
+Recap
+</span>
+<br>
+We already discussed in Linux basics section that applications should run as nonroot user.
+
+User roboshop is a function / daemon user to run the application. Apart from that we dont use this user to login to server.
+
+Also, username roboshop has been picked because it more suits to our project name.
+
+We keep application in one standard location. This is a usual practice that runs in the organization.
+
+</div>
+<br>
+
+3. Add application User
+
+```sh
+useradd roboshop
+```
+
+4. Lets setup an app directory.
+
+```sh
+mkdir /app
+```
+
+5. Download the application code to created app directory.
+
+```sh
+curl -L -o /tmp/payment.zip https://roboshop-artifacts.s3.amazonaws.com/payment.zip
+cd /app
+unzip /tmp/payment.zip
+```
+
+Every application is developed by development team will have some common softwares that they use as libraries. This application also have the same way of defined dependencies in the application configuration.
+
+6. Lets download the dependencies.
+
+```sh
+cd /app
+pip3.6 install -r requirements.txt
+```
+
+7.Load the service.
+
+```sh
+systemctl daemon-reload
+```
+
+8. Start the service.
+
+```sh
+systemctl enable payment
+systemctl start payment
+```
