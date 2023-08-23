@@ -428,3 +428,316 @@ You can edit file by using vim /etc/redis.conf & vim /etc/redis/redis.conf
 systemctl enable redis
 systemctl restart redis
 ```
+
+### 05. User
+
+User is a microservice that is responsible for User Logins and Registrations Service in RobotShop e-commerce portal.
+
+<div style="background-color: #e6f6e6; padding: 10px; border-radius: 5px;border-left:4px solid #008b00">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+ <svg style="display:inline-flex;height:1.6em;width:1.6em;" viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg>
+HINT
+</span>
+<br>
+Developer has chosen NodeJs, Check with developer which version of NodeJS is needed. Developer has set a context that it can work with NodeJS >18
+</div>
+<br>
+
+curl: This is a command-line tool used to transfer data to or from a server using various protocols. It's commonly used for making HTTP requests, but it supports many other protocols as well.
+-s or --silent: This flag tells curl to operate in silent mode, which means it won't show progress or error messages.
+-L or --location: This flag tells curl to follow HTTP redirects. If a server responds with a redirect (HTTP status code 3xx), curl will automatically request the new location provided by the server.
+
+1. Setup NodeJS repos. Vendor is providing a script to setup the repos.
+
+```sh
+curl -sL https://rpm.nodesource.com/setup_lts.x | bash
+```
+
+2.  To have it installed the MongoDB repo ,we have to creatte a file `mongo.repo`
+
+```mongo.repo
+[mongodb-org-4.2]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.2/x86_64/
+gpgcheck=0
+enabled=1
+```
+
+3. copy the file in `/etc/yum.repos.d/mongo.repo`
+
+```sh
+cp mongo.repo /etc/yum.repos.d/mongo.repo
+```
+
+We need to setup a new service in systemd so systemctl can manage this service
+
+<div style="background-color: #eef9fd; padding: 10px; border-radius: 5px;border-left:4px solid #4cb3d4">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+ <svg  style="display:inline-block;height:1.6em;width:1.6em;" viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+INFO
+</span>
+<br>
+We already discussed in linux basics that advantages of systemctl managing services, Hence we are taking that approach. Which is also a standard way in the OS.
+
+RECAP You can create file by using <strong>vim /etc/systemd/system/user.service</strong>
+
+</div>
+<br>
+
+4. Setup SystemD User Service
+
+```sh
+cp user.service /etc/systemd/system/user.service
+```
+
+5. Install NodeJS
+
+```sh
+yum install nodejs -y
+```
+
+6. Configure the application. Here
+
+<div style="background-color: #eef9fd; padding: 10px; border-radius: 5px;border-left:4px solid #4cb3d4">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+ <svg  style="display:inline-block;height:1.6em;width:1.6em;" viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+INFO
+</span>
+<br>
+Our application developed by the user is not having any RPM software just like other softwares. So we need to configure every step manually
+</div>
+<br>
+
+<div style="background-color: #fff8e6; padding: 10px; border-radius: 5px;border-left:4px solid #d99e00">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+<svg style="display:inline-block;height:1.6em;width:1.6em;" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg>
+Recap
+</span>
+<br>
+We already discussed in Linux basics section that applications should run as nonroot user.
+
+</div>
+<br>
+
+7. Add application User
+
+```sh
+useradd roboshop
+```
+
+<div style="background-color: #eef9fd; padding: 10px; border-radius: 5px;border-left:4px solid #4cb3d4">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+ <svg  style="display:inline-block;height:1.6em;width:1.6em;" viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+INFO
+</span>
+<br>
+User <strong>roboshop</strong> is a function / daemon user to run the application. Apart from that we dont use this user to login to server.
+
+Also, username <strong>roboshop</strong> has been picked because it more suits to our project name.
+
+We keep application in one standard location. This is a usual practice that runs in the organization.
+
+</div>
+<br>
+
+8. Lets setup an app directory.
+
+```sh
+mkdir /app
+```
+
+9. Download the application code to created app directory.
+
+```sh
+curl -L -o /tmp/user.zip https://roboshop-artifacts.s3.amazonaws.com/user.zip
+cd /app
+unzip /tmp/user.zip
+```
+
+Every application is developed by development team will have some common softwares that they use as libraries. This application also have the same way of defined dependencies in the application configuration.
+
+Lets download the dependencies.
+
+```sh
+cd /app
+npm install
+```
+
+10. install mongodb-client
+
+```sh
+yum install mongodb-org-shell -y
+```
+
+11. Load Schema
+
+```sh
+mongo --host MONGODB-SERVER-IPADDRESS </app/schema/user.js
+```
+
+12. Load the service.
+
+```sh
+systemctl daemon-reload
+```
+
+13. Start the service.
+
+```sh
+systemctl enable user
+systemctl restart user
+```
+
+### 06. Cart
+
+Cart is a microservice that is responsible for Cart Service in RobotShop e-commerce portal.
+
+<div style="background-color: #e6f6e6; padding: 10px; border-radius: 5px;border-left:4px solid #008b00">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+ <svg style="display:inline-flex;height:1.6em;width:1.6em;" viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg>
+HINT
+</span>
+<br>
+Developer has chosen NodeJs, Check with developer which version of NodeJS is needed.
+</div>
+<br>
+
+1. Setup NodeJS repos. Vendor is providing a script to setup the repos.
+
+```sh
+curl -sL https://rpm.nodesource.com/setup_lts.x | bash
+```
+
+2.  To have it installed the MongoDB repo ,we have to creatte a file `mongo.repo`
+
+```mongo.repo
+[mongodb-org-4.2]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.2/x86_64/
+gpgcheck=0
+enabled=1
+```
+
+3. copy the file in `/etc/yum.repos.d/mongo.repo`
+
+```sh
+cp mongo.repo /etc/yum.repos.d/mongo.repo
+```
+
+We need to setup a new service in systemd so systemctl can manage this service
+
+<div style="background-color: #eef9fd; padding: 10px; border-radius: 5px;border-left:4px solid #4cb3d4">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+ <svg  style="display:inline-block;height:1.6em;width:1.6em;" viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+INFO
+</span>
+<br>
+We already discussed in linux basics that advantages of systemctl managing services, Hence we are taking that approach. Which is also a standard way in the OS.
+
+RECAP You can create file by using <strong>vim /etc/systemd/system/user.service</strong>
+
+</div>
+<br>
+
+4. Setup SystemD User Service
+
+```sh
+cp user.service /etc/systemd/system/user.service
+```
+
+5. Install NodeJS
+
+```sh
+yum install nodejs -y
+```
+
+6. Configure the application. Here
+
+<div style="background-color: #eef9fd; padding: 10px; border-radius: 5px;border-left:4px solid #4cb3d4">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+ <svg  style="display:inline-block;height:1.6em;width:1.6em;" viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+INFO
+</span>
+<br>
+Our application developed by the own developer is not having any RPM software just like other softwares. So we need to configure every step manually
+</div>
+<br>
+
+<div style="background-color: #fff8e6; padding: 10px; border-radius: 5px;border-left:4px solid #d99e00">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+<svg style="display:inline-block;height:1.6em;width:1.6em;" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"></path></svg>
+Recap
+</span>
+<br>
+We already discussed in Linux basics section that applications should run as nonroot user.
+</div>
+<br>
+
+7. Add application User
+
+```sh
+useradd roboshop
+```
+
+<div style="background-color: #eef9fd; padding: 10px; border-radius: 5px;border-left:4px solid #4cb3d4">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+ <svg  style="display:inline-block;height:1.6em;width:1.6em;" viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+INFO
+</span>
+<br>
+User <strong>roboshop</strong> is a function / daemon user to run the application. Apart from that we dont use this user to login to server.
+
+Also, username <strong>roboshop</strong> has been picked because it more suits to our project name.
+
+We keep application in one standard location. This is a usual practice that runs in the organization.
+
+</div>
+<br>
+
+8. Lets setup an app directory.
+
+```sh
+mkdir /app
+```
+
+9. Download the application code to created app directory.
+
+```sh
+curl -L -o /tmp/cart.zip https://roboshop-artifacts.s3.amazonaws.com/cart.zip
+cd /app
+unzip /tmp/cart.zip
+```
+
+Every application is developed by development team will have some common softwares that they use as libraries. This application also have the same way of defined dependencies in the application configuration.
+
+Lets download the dependencies.
+
+```sh
+cd /app
+npm install
+```
+
+10. install mongodb-client
+
+```sh
+yum install mongodb-org-shell -y
+```
+
+11. Load Schema
+
+```sh
+mongo --host MONGODB-SERVER-IPADDRESS </app/schema/user.js
+```
+
+12. Load the service.
+
+```sh
+systemctl daemon-reload
+```
+
+13. Start the service.
+
+```sh
+systemctl enable user
+systemctl restart user
+```
