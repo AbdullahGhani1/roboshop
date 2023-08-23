@@ -171,13 +171,64 @@ Catalogue is a microservice that is responsible for serving the list of items th
 curl -sL https://rpm.nodesource.com/setup_lts.x | bash
 ```
 
-2. Install NodeJS
+2.  To have it installed the MongoDB repo ,we have to creatte a file `mongo.repo`
+
+```mongo.repo
+[mongodb-org-4.2]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.2/x86_64/
+gpgcheck=0
+enabled=1
+```
+
+3. copy the file in `/etc/yum.repos.d/mongo.repo`
+
+```sh
+cp mongo.repo /etc/yum.repos.d/mongo.repo
+```
+
+We need to setup a new service in <strong>systemd</strong> so systemctl can manage this service
+
+<div style="background-color: #eef9fd; padding: 10px; border-radius: 5px;border-left:4px solid #4cb3d4">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+ <svg  style="display:inline-block;height:1.6em;width:1.6em;" viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
+INFO
+</span>
+<br>
+We already discussed in linux basics that advantages of systemctl managing services, Hence we are taking that approach. Which is also a standard way in the OS.
+</div>
+<br>
+
+4. To Setup a SystemD Catalogue Service. create a file catalogue.service
+
+```service
+[Unit]
+Description = Catalogue Service
+
+[Service]
+User=roboshop
+Environment=MONGO=true
+Environment=MONGO_URL="mongodb://<MONGODB-SERVER-IPADDRESS>:27017/catalogue"
+ExecStart=/bin/node /app/server.js
+SyslogIdentifier=catalogue
+
+[Install]
+WantedBy=multi-user.target
+```
+
+5. Copy catalogue.service at `/etc/systemd/system/catalogue.service`
+
+```sh
+cp catalogue.service /etc/systemd/system/catalogue.service
+```
+
+6. Install NodeJS
 
 ```sh
 yum install nodejs -y
 ```
 
-3. Configure the application.
+7. Configure the application.
 
 <div style="background-color: #eef9fd; padding: 10px; border-radius: 5px;border-left:4px solid #4cb3d4">
 <span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
@@ -201,7 +252,7 @@ We already discussed in Linux basics section that applications should run as non
 </div>
 <br>
 
-4. Add application User
+8. Add application User
 
 ```sh
 useradd roboshop
@@ -222,13 +273,13 @@ We keep application in one standard location. This is a usual practice that runs
 </div>
 <br>
 
-5. Lets setup an app directory.
+9. Lets setup an app directory.
 
 ```sh
 mkdir /app
 ```
 
-6. Download the application code to created app directory.
+10. Download the application code to created app directory.
 
 ```sh
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue.zip
@@ -238,40 +289,11 @@ unzip /tmp/catalogue.zip
 
 Every application is developed by development team will have some common softwares that they use as libraries. This application also have the same way of defined dependencies in the application configuration.
 
-7. Lets download the dependencies.
+11. Lets download the dependencies.
 
 ```sh
 cd /app
 npm install
-```
-
-We need to setup a new service in <strong>systemd</strong> so systemctl can manage this service
-
-<div style="background-color: #eef9fd; padding: 10px; border-radius: 5px;border-left:4px solid #4cb3d4">
-<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
- <svg  style="display:inline-block;height:1.6em;width:1.6em;" viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg>
-INFO
-</span>
-<br>
-We already discussed in linux basics that advantages of systemctl managing services, Hence we are taking that approach. Which is also a standard way in the OS.
-</div>
-<br>
-
-8. Setup SystemD Catalogue Service
-
-```service
-[Unit]
-Description = Catalogue Service
-
-[Service]
-User=roboshop
-Environment=MONGO=true
-Environment=MONGO_URL="mongodb://<MONGODB-SERVER-IPADDRESS>:27017/catalogue"
-ExecStart=/bin/node /app/server.js
-SyslogIdentifier=catalogue
-
-[Install]
-WantedBy=multi-user.target
 ```
 
 <div style="background-color: #eef9fd; padding: 10px; border-radius: 5px;border-left:4px solid #4cb3d4">
@@ -294,7 +316,19 @@ Ensure you replace <MONGODB-SERVER-IPADDRESS> with IP address
 </div>
 <br>
 
-9. Load the service.
+12. install mongodb-client
+
+```sh
+yum install mongodb-org-shell -y
+```
+
+13. Load Schema
+
+```sh
+mongo --host MONGODB-SERVER-IPADDRESS </app/schema/catalogue.js
+```
+
+14. Load the service.
 
 ```sh
 systemctl daemon-reload
@@ -310,11 +344,11 @@ This above command is because we added a new service, We are telling systemd to 
 </div>
 <br>
 
-10. Start the service.
+15. Start the service.
 
 ```sh
 systemctl enable catalogue
-systemctl start catalogue
+systemctl restart catalogue
 ```
 
 For the application to work fully functional we need to load schema to the Database.
@@ -328,28 +362,6 @@ INFO
 Schemas are usually part of application code and developer will provide them as part of development.
 </div>
 <br>
-
-We need to load the schema. To load schema we need to install mongodb client.
-
-11. To have it installed we can setup MongoDB repo and install mongodb-client
-
-```mongo.repo
-[mongodb-org-4.2]
-name=MongoDB Repository
-baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.2/x86_64/
-gpgcheck=0
-enabled=1
-```
-
-```sh
-yum install mongodb-org-shell -y
-```
-
-12. Load Schema
-
-```sh
-mongo --host MONGODB-SERVER-IPADDRESS </app/schema/catalogue.js
-```
 
 <div style="background-color: #fff8e6; padding: 10px; border-radius: 5px;border-left:4px solid #d99e00">
 <span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
@@ -381,7 +393,6 @@ Versions of the DB Software you will get context from the developer, Meaning we 
 
 ```sh
 yum install https://rpms.remirepo.net/enterprise/remi-release-8.rpm -y
-
 ```
 
 2. Enable Redis 6.2 from package streams.
@@ -394,7 +405,6 @@ yum module enable redis:remi-6.2 -y
 
 ```sh
 yum install redis -y
-
 ```
 
 Usually Redis opens the port only to localhost(127.0.0.1), meaning this service can be accessed by the application that is hosted on this server only. However, we need to access this service to be accessed by another server, So we need to change the config accordingly.
