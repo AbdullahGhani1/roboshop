@@ -108,7 +108,7 @@ Developer has chosen the database MongoDB. Hence, we are trying to install it up
 
 <div style="background-color: #d8f5e1; padding: 10px; border-radius: 5px;">
 <span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
-  <svg style="display:inline-block;height:1.6em;width:1.6em;" viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg>
+  <svg style="display:inline-flex;height:1.6em;width:1.6em;" viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg>
   Hint
   </span>
   <br>
@@ -361,3 +361,60 @@ You need to update catalogue server ip address in frontend configuration. Config
 
 </div>
 <br>
+
+### 04. Redis
+
+Redis is used for in-memory data storage(Caching) and allows users to access the data of database over API.
+
+<div style="background-color: #e6f6e6; padding: 10px; border-radius: 5px;border-left:4px solid #008b00">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+ <svg style="display:inline-flex;height:1.6em;width:1.6em;" viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg>
+HINT
+</span>
+<br>
+Versions of the DB Software you will get context from the developer, Meaning we need to check with developer.
+
+</div>
+<br>
+
+1. Redis is offering the repo file as a rpm. Lets install it
+
+```sh
+yum install https://rpms.remirepo.net/enterprise/remi-release-8.rpm -y
+
+```
+
+2. Enable Redis 6.2 from package streams.
+
+```sh
+yum module enable redis:remi-6.2 -y
+```
+
+3. Install Redis
+
+```sh
+yum install redis -y
+
+```
+
+Usually Redis opens the port only to localhost(127.0.0.1), meaning this service can be accessed by the application that is hosted on this server only. However, we need to access this service to be accessed by another server, So we need to change the config accordingly.
+
+4.Update listen address from 127.0.0.1 to 0.0.0.0 in `/etc/redis.conf` & `/etc/redis/redis.conf`
+
+<div style="background-color: #e6f6e6; padding: 10px; border-radius: 5px;border-left:4px solid #008b00">
+<span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
+ <svg style="display:inline-flex;height:1.6em;width:1.6em;" viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg>
+TIP
+</span>
+<br>
+You can edit file by using vim /etc/redis.conf & vim /etc/redis/redis.conf
+
+</div>
+<br>
+
+5. Start & Enable Redis Service
+
+```sh
+systemctl enable redis
+systemctl restart redis
+```
