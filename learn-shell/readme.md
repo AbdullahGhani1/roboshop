@@ -608,22 +608,6 @@ Developer has chosen NodeJs, Check with developer which version of NodeJS is nee
 curl -sL https://rpm.nodesource.com/setup_lts.x | bash
 ```
 
-2.  To have it installed the MongoDB repo ,we have to creatte a file `mongo.repo`
-
-```mongo.repo
-[mongodb-org-4.2]
-name=MongoDB Repository
-baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.2/x86_64/
-gpgcheck=0
-enabled=1
-```
-
-3. copy the file in `/etc/yum.repos.d/mongo.repo`
-
-```sh
-cp mongo.repo /etc/yum.repos.d/mongo.repo
-```
-
 We need to setup a new service in systemd so systemctl can manage this service
 
 <div style="background-color: #eef9fd; padding: 10px; border-radius: 5px;border-left:4px solid #4cb3d4">
@@ -639,19 +623,19 @@ RECAP You can create file by using <strong>vim /etc/systemd/system/user.service<
 </div>
 <br>
 
-4. Setup SystemD User Service
+2. Setup SystemD Cart Service
 
 ```sh
-cp user.service /etc/systemd/system/user.service
+cp cart.service /etc/systemd/system/cart.service
 ```
 
-5. Install NodeJS
+3. Install NodeJS
 
 ```sh
 yum install nodejs -y
 ```
 
-6. Configure the application. Here
+4. Configure the application. Here
 
 <div style="background-color: #eef9fd; padding: 10px; border-radius: 5px;border-left:4px solid #4cb3d4">
 <span style="display:inline-flex;margin-right: 0.4em;vertical-align: middle;">
@@ -673,7 +657,7 @@ We already discussed in Linux basics section that applications should run as non
 </div>
 <br>
 
-7. Add application User
+5. Add application User
 
 ```sh
 useradd roboshop
@@ -694,13 +678,13 @@ We keep application in one standard location. This is a usual practice that runs
 </div>
 <br>
 
-8. Lets setup an app directory.
+6. Lets setup an app directory.
 
 ```sh
 mkdir /app
 ```
 
-9. Download the application code to created app directory.
+7. Download the application code to created app directory.
 
 ```sh
 curl -L -o /tmp/cart.zip https://roboshop-artifacts.s3.amazonaws.com/cart.zip
@@ -710,32 +694,32 @@ unzip /tmp/cart.zip
 
 Every application is developed by development team will have some common softwares that they use as libraries. This application also have the same way of defined dependencies in the application configuration.
 
-Lets download the dependencies.
+8. Lets download the dependencies.
 
 ```sh
 cd /app
 npm install
 ```
 
-10. install mongodb-client
+9. install mongodb-client
 
 ```sh
 yum install mongodb-org-shell -y
 ```
 
-11. Load Schema
+10. Load Schema
 
 ```sh
 mongo --host MONGODB-SERVER-IPADDRESS </app/schema/user.js
 ```
 
-12. Load the service.
+11. Load the service.
 
 ```sh
 systemctl daemon-reload
 ```
 
-13. Start the service.
+12. Start the service.
 
 ```sh
 systemctl enable user
