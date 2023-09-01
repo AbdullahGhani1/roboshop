@@ -25,6 +25,6 @@ systemctl restart user
 
 yum install mongodb-org-shell -y
 
-mongo --host MONGODB-SERVER-IPADDRESS </app/schema/user.js
+mongo --host mongodb.domain.com </app/schema/user.js
 
 
