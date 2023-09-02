@@ -1156,3 +1156,312 @@ systemctl daemon-reload
 systemctl enable dispatch
 systemctl start dispatch
 ```
+
+---
+
+#### update the domain on all service where required
+
+- Now create a AWs Ec2 instances for all services and configure domain
+- to check all ec2 instance configure with domain correctly . We will compare with dashboard
+
+```sh
+nslookup cart.domain.com
+nslookup catalogue.domain.com
+nslookup dispatch.domain.com
+nslookup frontend.domain.com
+nslookup mongodb.domain.com
+nslookup mysql.domain.com
+nslookup payment.domain.com
+nslookup rabbitmq.domain.com
+nslookup redis.domain.com
+nslookup shipping.domain.com
+nslookup user.domain.com
+```
+
+#### 1. login AWS Mongodb EC2 instance
+
+- set the name of host
+
+```sh
+sudo set-hostname mongodb
+```
+
+- clone the repo
+
+```sh
+git clone https://github.com/AbdullahGhani1/roboshop/tree/main/learn-shell
+```
+
+- Go to repo folder and run mongodb Script
+
+```sh
+cd learn-shell
+sudo bash mongodb.sh
+
+sudo netstat -nltp
+```
+
+- In **roboshop** Project,we are using 0.0.0.0 but mongodb currently running on bindIp **127.0.0.1** For a time being, we are manually changing it
+
+```sh
+sudo vi /etc/mongodb.conf
+```
+
+- After changing bindIp restart **mongodb** service
+
+```sh
+sudo systemctl restart mongodb
+```
+
+### What is Technical Debt in agile
+
+Technical debt in Agile refers to the concept of accumulating suboptimal or unfinished work in software development projects. It arises when development teams prioritize delivering features quickly, often at the expense of code quality, maintainability, or best practices. This debt, like financial debt, must be paid off eventually, or it can lead to various problems in the project's lifecycle.
+
+Here's how technical debt relates to Agile methodologies:
+![technical Debt](./assets/images/technical-debt-in-agile.jpg)
+
+1. **Rapid Development:** Agile methodologies, such as Scrum or Kanban, emphasize delivering working software in short iterations. This focus on quick releases can sometimes lead to shortcuts, like writing quick and dirty code to meet deadlines. These shortcuts accumulate over time and result in technical debt.
+
+2. **Continuous Improvement:** Agile encourages teams to continuously inspect and adapt. Part of this adaptation process includes addressing technical debt. Teams should allocate time in their sprints or iterations to refactor and improve existing code, thus reducing technical debt.
+
+3. **Backlog Management:** In Agile, the product backlog contains a list of features, user stories, and technical tasks. Technical debt items can be added to the backlog just like other work items. The Product Owner and the team must prioritize these items based on their impact on the project.
+
+4. **Transparency:** Agile promotes transparency and open communication within the team and with stakeholders. It's essential to communicate the presence of technical debt to all relevant parties so that they understand the trade-offs and potential risks involved.
+
+5. **Balancing Act:** Managing technical debt is a balancing act in Agile. Teams must weigh the need for quick feature delivery against the long-term stability and maintainability of the codebase. Decisions regarding when and how to address technical debt should be made collaboratively by the team, considering the project's goals and constraints.
+
+6. **Technical Debt Refinement:** In some Agile frameworks like Scrum, teams can incorporate technical debt refinement sessions into their sprint planning. This allows them to allocate time to tackle technical debt alongside new features, ensuring that it doesn't get neglected.
+
+7. **Continuous Monitoring:** Agile teams should continuously monitor technical debt levels. Tools and metrics can help track code quality and identify areas with high technical debt. Regularly reviewing and addressing technical debt can prevent it from becoming unmanageable.
+
+#### 2. SSH Catalogue AWS EC2 instance
+
+```sh
+ssh catalogue.domain.com
+```
+
+- set the name of host
+
+```sh
+sudo set-hostname mongodb
+```
+
+- clone the repo
+
+```sh
+git clone https://github.com/AbdullahGhani1/roboshop/tree/main/learn-shell
+```
+
+```sh
+cd learn-shell
+sudo bash catalogue.sh
+```
+
+#### 3. SSH Frontend Server AWS EC2 instance
+
+```sh
+ssh frontend.domain.com
+```
+
+- set the name of host
+
+```sh
+sudo set-hostname frontend
+```
+
+- clone the repo
+
+```sh
+git clone https://github.com/AbdullahGhani1/roboshop/tree/main/learn-shell
+```
+
+```sh
+cd learn-shell
+sudo bash frontend.sh
+```
+
+#### 4. SSH Redis Server AWS EC2 instance
+
+```sh
+ssh redis.domain.com
+```
+
+- set the name of host
+
+```sh
+sudo set-hostname redis
+```
+
+- clone the repo
+
+```sh
+git clone https://github.com/AbdullahGhani1/roboshop/tree/main/learn-shell
+```
+
+```sh
+cd learn-shell
+sudo bash redis.sh
+```
+
+- In **roboshop** Project,we are using 0.0.0.0 but redis currently running on bindIp **127.0.0.1** For a time being, we are manually changing it
+
+```sh
+sudo vi /etc/redis.conf
+sudo vi /etc/redis/redis.conf
+```
+
+- After changing bindIp restart **redis** service
+
+```sh
+sudo systemctl restart redis
+```
+
+#### 5. SSH User Server AWS EC2 instance
+
+```sh
+ssh user.domain.com
+```
+
+- set the name of host
+
+```sh
+sudo set-hostname user
+```
+
+- clone the repo
+
+```sh
+git clone https://github.com/AbdullahGhani1/roboshop/tree/main/learn-shell
+```
+
+```sh
+cd learn-shell
+sudo bash user.sh
+```
+
+- check from front user is able to register
+
+#### 6. SSH Cart Server AWS EC2 instance
+
+```sh
+ssh cart.domain.com
+```
+
+- set the name of host
+
+```sh
+sudo set-hostname cart
+```
+
+- clone the repo
+
+```sh
+git clone https://github.com/AbdullahGhani1/roboshop/tree/main/learn-shell
+```
+
+```sh
+cd learn-shell
+sudo bash cart.sh
+```
+
+- check from frontend cart is working?
+
+#### 7. SSH MySQL Server AWS EC2 instance
+
+```sh
+ssh mysql.domain.com
+```
+
+- set the name of host
+
+```sh
+sudo set-hostname mysql
+```
+
+- clone the repo
+
+```sh
+git clone https://github.com/AbdullahGhani1/roboshop/tree/main/learn-shell
+```
+
+```sh
+cd learn-shell
+sudo bash mysql.sh
+```
+
+- check mysql service is working?
+
+```sh
+mysql -uroot -pRoboShop@1
+```
+
+#### 8. SSH Shipping Server AWS EC2 instance
+
+```sh
+ssh shipping.domain.com
+```
+
+- set the name of host
+
+```sh
+sudo set-hostname shipping
+```
+
+- clone the repo
+
+```sh
+git clone https://github.com/AbdullahGhani1/roboshop/tree/main/learn-shell
+```
+
+```sh
+cd learn-shell
+sudo bash shipping.sh
+```
+
+#### 9. SSH RabbitMQ Server AWS EC2 instance
+
+```sh
+ssh rabbitmq.domain.com
+```
+
+- set the name of host
+
+```sh
+sudo set-hostname rabbitmq
+```
+
+- clone the repo
+
+```sh
+git clone https://github.com/AbdullahGhani1/roboshop/tree/main/learn-shell
+```
+
+```sh
+cd learn-shell
+sudo bash rabbitmq.sh
+```
+
+#### 10. SSH Payment Server AWS EC2 instance
+
+```sh
+ssh payment.domain.com
+```
+
+- set the name of host
+
+```sh
+sudo set-hostname payment
+```
+
+- clone the repo
+
+```sh
+git clone https://github.com/AbdullahGhani1/roboshop/tree/main/learn-shell
+```
+
+```sh
+cd learn-shell
+sudo bash payment.sh
+```
+
+![text](./assets/images/roboshopShell.jpg)
